@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
 	"os/signal"
+	"path"
 	"path/filepath"
 	"sync"
 	"syscall"
@@ -21,10 +23,24 @@ var excludes []string
 var version bool
 
 func init() {
-	flag.StringVarP(&buildCmd, "build", "b", "", "help message for flagname")
-	flag.StringVarP(&watch, "watch", "w", ".", "directory to watch")
-	flag.StringSliceVarP(&excludes, "exclude", "e", []string{}, "dirs to exclude")
+	flag.Usage = usage
+	flag.ErrHelp = errors.New("")
+	flag.StringVarP(&buildCmd, "build", "b", "", "build command")
+	flag.StringVarP(&watch, "watch", "w", ".", "directory path to watch for changes")
+	flag.StringSliceVarP(&excludes, "exclude", "e", []string{}, "directories to exclude")
 	flag.BoolVarP(&version, "version", "v", false, "show version")
+}
+
+func usage() {
+	cmd := path.Base(os.Args[0])
+	fmt.Fprintf(os.Stderr, "USAGE:\n")
+	fmt.Fprintf(os.Stderr, "    %s [OPTIONS] -- COMMAND\n", cmd)
+	fmt.Fprintf(os.Stderr, "e.g.\n")
+	fmt.Fprintf(os.Stderr, "    %s --build 'go build -o mytool .' -- mytool\n", cmd)
+	fmt.Fprintf(os.Stderr, "    %s --exclude dir1 --exclude dir2 -- mytool\n", cmd)
+	fmt.Fprintf(os.Stderr, "    %s --watch assets/ -- npm build\n\n", cmd)
+	fmt.Fprintf(os.Stderr, "FLAGS:\n")
+	flag.PrintDefaults()
 }
 
 func main() {
@@ -36,8 +52,7 @@ func main() {
 	}
 
 	if flag.NArg() < 1 {
-		fmt.Printf("Missing command to execute!\n")
-		fmt.Printf("rebuild -b 'go build' -w . -- [COMMAND --with --args]\n")
+		fmt.Printf("Missing command to execute!\n\n")
 		flag.Usage()
 		os.Exit(1)
 	}

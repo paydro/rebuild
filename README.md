@@ -28,7 +28,7 @@ you'd like to run tests after file changes:
 rebuild -- go test ./...
 ```
 
-`rebuild` also works well with projects that run continuosly like HTTP servers.
+`rebuild` also works well with projects that run continuously like HTTP servers.
 In the following example, when a file changes in the current directory, the
 `http` binary is built, and executed. When a new change occurs, `rebuild` will
 properly kill the old `http` binary, rebuild the binary, and execute `http`
