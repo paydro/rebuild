@@ -60,7 +60,7 @@ func (p *pidManager) execBuildCmd() error {
 		return nil
 	}
 
-	cmd := exec.Command(p.buildCmd)
+	cmd := exec.Command("bash", "-c", p.buildCmd)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
