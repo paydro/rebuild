@@ -73,8 +73,9 @@ func main() {
 
 	// start process manager
 	process := NewPIDManager(runCmd, buildCmd)
+	process.Start()
 	wg.Add(1)
-	go process.Start(ctx, &wg, eventNotifier)
+	go process.Listen(ctx, &wg, eventNotifier)
 
 	// TODO add ability for watcher to signal a failure (i.e., the Start()
 	// function died or something so main can properly shut down pidmanager or

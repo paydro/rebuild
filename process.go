@@ -19,17 +19,20 @@ type pidManager struct {
 	command  *exec.Cmd
 }
 
-func (p *pidManager) Start(ctx context.Context, wg *sync.WaitGroup, notify chan struct{}) {
-	defer wg.Done()
+func (p *pidManager) Start() {
 	err := p.execBuildCmd()
-	if err == nil {
-		err = p.startRunCmd()
-	}
-
 	if err != nil {
-		log.Println("Failed to build or run command.")
+		log.Printf("Failed to build: %s\n", err)
 	}
 
+	err = p.startRunCmd()
+	if err != nil {
+		log.Printf("Failed to run command: %s\n", err)
+	}
+}
+
+func (p *pidManager) Listen(ctx context.Context, wg *sync.WaitGroup, notify chan struct{}) {
+	defer wg.Done()
 	for {
 		select {
 		case <-ctx.Done():
