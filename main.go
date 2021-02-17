@@ -58,8 +58,6 @@ func main() {
 	}
 
 	runCmd := flag.Args()
-	fmt.Println("Run Command: ", runCmd)
-
 	ctx, cancel := context.WithCancel(context.Background())
 
 	eventNotifier := make(chan struct{})

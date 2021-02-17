@@ -22,12 +22,12 @@ type pidManager struct {
 func (p *pidManager) Start() {
 	err := p.execBuildCmd()
 	if err != nil {
-		log.Printf("Failed to build: %s\n", err)
-	}
-
-	err = p.startRunCmd()
-	if err != nil {
-		log.Printf("Failed to run command: %s\n", err)
+		logError("build cmd failed", err)
+	} else {
+		err = p.startRunCmd()
+		if err != nil {
+			logError("run cmd failed", err)
+		}
 	}
 }
 
@@ -41,21 +41,16 @@ func (p *pidManager) Listen(ctx context.Context, wg *sync.WaitGroup, notify chan
 
 		case <-notify:
 			p.stopRunCmd()
-			err := p.execBuildCmd()
-			if err != nil {
-				log.Printf("build failed: %s\n", err)
-			}
-
-			err = p.startRunCmd()
-			if err != nil {
-				log.Printf("run failed: %s\n", err)
-			}
-
+			p.Start()
 			notify <- struct{}{}
 		}
 	}
 
 	log.Println("pidManager: stopped")
+}
+
+func logError(msg string, err error) {
+	log.Printf("REBUILD Error: %s: %s", msg, err)
 }
 
 func (p *pidManager) execBuildCmd() error {
